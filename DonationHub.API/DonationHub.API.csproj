@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>b53be55f-585e-453c-b145-2afef3e66557</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.1-preview.1" />
+    <PackageReference Include="NuGet.Packaging" Version="7.9.0" />
+    <PackageReference Include="NuGet.Protocol" Version="7.9.0" />
+	  <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
+	  <PackageReference Include="Scalar.AspNetCore" Version="2.19.0" />
+	
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DonationHub.Application\DonationHub.Application.csproj" />
+    <ProjectReference Include="..\DonationHub.Infrastructure\DonationHub.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

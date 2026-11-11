@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.Packaging" Version="7.9.0" />
+    <PackageReference Include="NuGet.Protocol" Version="7.9.0" />
+    <ProjectReference Include="..\DonationHub.Application\DonationHub.Application.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.14" />
+	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.3.1" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.3.1" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
+	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" />
+	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
+	  <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\" />
+  </ItemGroup>
+	
+</Project>
