@@ -1,4 +1,5 @@
-﻿namespace DonationHub.Domain.Campaigns.Contract
+﻿
+namespace DonationHub.Domain.Common.Contracts
 {
     public interface ISoftDeletable
     {
@@ -9,3 +10,4 @@
 
     }
 }
+

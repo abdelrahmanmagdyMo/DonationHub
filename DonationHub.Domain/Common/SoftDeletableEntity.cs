@@ -1,4 +1,4 @@
-﻿using DonationHub.Domain.Campaigns.Contract;
+﻿using DonationHub.Domain.Common.Contracts;
 
 namespace DonationHub.Domain.Common
 {

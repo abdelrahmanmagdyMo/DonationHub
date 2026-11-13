@@ -1,4 +1,5 @@
-﻿using DonationHub.Domain.Campaigns.Contract;
+﻿
+using DonationHub.Domain.Common.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
