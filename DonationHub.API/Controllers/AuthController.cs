@@ -1,59 +1,51 @@
-﻿using DonationHub.Application.Authentications.DTOs;
-using DonationHub.Application.Features.Auth;
-using DonationHub.Infrastructure.Persistence;
-using DonationHub.Infrastructure.Persistence.Identity;
+﻿using DonationHub.Application.Features.Identity.Commands.Login;
+using DonationHub.Application.Features.Identity.Commands.Logout;
+using DonationHub.Application.Features.Identity.Commands.Refresh;
+using DonationHub.Application.Features.Identity.Commands.Register;
+using DonationHub.Application.Features.Identity.Commands.RegisterAdmin;
+using DonationHub.Application.Features.Identity.Queries.GetCurrentUser;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace DonationHub.API.Controllers
 {
-    public class AuthController(AppDbContext context, UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        IAuthService authService) : BaseApiController
+    public class AuthController(ISender sender) : BaseApiController
     {
+        [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto register)
-        {
-            await authService.RegisterAsync(register);
-            return Ok();
-        }
+        public async Task<IActionResult> Register(RegisterCommand registerCommand, CancellationToken ct)
+        => ToActionResult(await sender.Send(registerCommand, ct));
+
+
+        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
-        {
-            var result = await authService.LoginAsync(loginDto);
-            return Ok(result);
-        }
+        public async Task<IActionResult> Login(LoginCommand loginCommand, CancellationToken ct)
+       => ToActionResult(await sender.Send(loginCommand, ct));
+
+
+        [AllowAnonymous]
         [HttpPost("logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout(RefreshTokenRequestDto dto)
-        {
-            await authService.RevokeRefreshTokenAsync(dto);
-            return NoContent();
-        }
+
+        public async Task<IActionResult> Logout(LogoutCommand logoutCommand, CancellationToken ct)
+       => ToActionResult(await sender.Send(logoutCommand, ct));
+
+
         [HttpPost("me")]
         [Authorize]
-        public async Task<IActionResult> GetMe()
-        {
-            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdValue, out var userId)) return Unauthorized();
-            var user = await authService.GetUserByIdAsync(userId.ToString());
-            return Ok(user);
-        }
+        public async Task<IActionResult> GetMe(CancellationToken ct)
+            => ToActionResult(await sender.Send(new GetCurrentUserQuery(), ct));
+
+
         [Authorize(Roles = "Admin")]
         [HttpPost("admin/staff")]
-        public async Task<IActionResult> CreateStaff([FromBody] AdminRegisterDto dto)
-        {
-            await authService.RegisterAdminORCampignManager(dto);
-            return Ok();
-        }
+        public async Task<IActionResult> CreateStaff(RegisterAdminCommand adminCommand, CancellationToken ct)
+      => ToActionResult(await sender.Send(adminCommand, ct));
+
+        [AllowAnonymous]
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshTokenRequestDto dto)
-        {
-            var result = await authService.RefreshTokenAsync(dto);
-            return Ok(result);
-        }
+        public async Task<IActionResult> Refresh(RefreshTokenCommand refreshToken, CancellationToken ct)
+       => ToActionResult(await sender.Send(refreshToken, ct));
 
     }
 }

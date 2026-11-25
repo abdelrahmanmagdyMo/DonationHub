@@ -1,4 +1,5 @@
-﻿using DonationHub.Infrastructure.Persistence.Identity;
+﻿using DonationHub.Domain.Identity.RefreshToken;
+using DonationHub.Infrastructure.Persistence.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

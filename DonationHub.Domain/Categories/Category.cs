@@ -1,32 +1,43 @@
 ﻿using DonationHub.Domain.Campaigns;
+using DonationHub.Domain.Categories.Errors;
 using DonationHub.Domain.Common;
+using DonationHub.Domain.Common.Results;
+using DonationHub.Domain.Common.Results.Abstractions;
 using DonationHub.Domain.ValueObjects;
 
-namespace DonationHub.Domain.Categories
+namespace DonationHub.Domain.Categories;
+
+public sealed class Category : AuditableEntity
 {
-    public sealed class Category : AuditableEntity
+    public LocalizedText Name { get; private set; } = null!;
+    public LocalizedText Description { get; private set; } = null!;
+    public ICollection<Campaign> Campaigns { get; private set; } = new List<Campaign>();
+
+    private Category() : base(Guid.Empty) { }
+
+    private Category(LocalizedText name, LocalizedText description) : base(Guid.Empty)
     {
-        public LocalizedText Name { get; private set; } = null!;
-        public LocalizedText Description { get; private set; } = null!;
-        public ICollection<Campaign> Campaigns { get; private set; } = new List<Campaign>();
+        Name = name;
+        Description = description;
+    }
+    public static Result<Category> Create(LocalizedText name, LocalizedText description)
+    {
+        if (name is null) return Result<Category>.Failure(CategoryErrors.Validation);
+        if (description is null) return Result<Category>.Failure(CategoryErrors.Validation);
+        var category = new Category(name, description);
+        return Result<Category>.Success(category);
+    }
+    public Result Update(LocalizedText name, LocalizedText description)
+    {
+        if (name is null)
+            return Result.Failure(CategoryErrors.Validation);
 
-        private Category() : base(Guid.Empty) { }
+        if (description is null)
+            return Result.Failure(CategoryErrors.Validation);
 
-        private Category(LocalizedText name, LocalizedText description) : base(Guid.Empty)
-        {
-            Name = name;
-            Description = description;
-        }
-        public static Category Create(LocalizedText name, LocalizedText description)
-        {
-            return new Category(name, description);
-        }
-        public void Update(LocalizedText name, LocalizedText description)
-        {
-            ArgumentNullException.ThrowIfNull(name);
-            ArgumentNullException.ThrowIfNull(description);
-            Name = name;
-            Description = description;
-        }
+        Name = name;
+        Description = description;
+
+        return Result.Success();
     }
 }

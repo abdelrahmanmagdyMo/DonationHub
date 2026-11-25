@@ -1,4 +1,4 @@
-﻿using DonationHub.Application.Contracts;
+﻿using DonationHub.Domain.Interfaces;
 using DonationHub.Domain.Payments;
 using DonationHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +16,12 @@ namespace DonationHub.Infrastructure.Concrete
 
         public async Task<IReadOnlyList<PaymentAttempt>> GetAllAsync(CancellationToken ct = default)
         {
-            return await context.PaymentAttempts.ToListAsync(ct);
+            return await context.PaymentAttempts.AsNoTracking().ToListAsync(ct);
         }
 
         public async Task<PaymentAttempt?> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
-            return await context.PaymentAttempts.FirstOrDefaultAsync(x => x.Id == id, ct);
+            return await context.PaymentAttempts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public void Update(PaymentAttempt entity)

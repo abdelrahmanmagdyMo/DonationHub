@@ -1,5 +1,5 @@
-﻿using DonationHub.Application.Contracts;
-using DonationHub.Domain.IdempotencyRecords;
+﻿using DonationHub.Domain.IdempotencyRecords;
+using DonationHub.Domain.Interfaces;
 using DonationHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,12 +15,12 @@ namespace DonationHub.Infrastructure.Concrete
 
         public async Task<IReadOnlyList<IdempotencyRecord>> GetAllAsync(CancellationToken ct = default)
         {
-            return await context.IdempotencyRecords.ToListAsync(ct);
+            return await context.IdempotencyRecords.AsNoTracking().ToListAsync(ct);
         }
 
         public async Task<IdempotencyRecord?> GetByIdAsync(string key, CancellationToken ct = default)
         {
-            return await context.IdempotencyRecords.FirstOrDefaultAsync(x => x.Key == key, ct);
+            return await context.IdempotencyRecords.AsNoTracking().FirstOrDefaultAsync(x => x.Key == key, ct);
         }
 
 

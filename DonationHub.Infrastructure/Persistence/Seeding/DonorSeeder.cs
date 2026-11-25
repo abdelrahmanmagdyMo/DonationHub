@@ -1,4 +1,5 @@
-﻿using DonationHub.Application.IdentityExceptions;
+﻿using DonationHub.Domain.Common.Results;
+using DonationHub.Domain.Common.Results.Abstractions;
 using DonationHub.Domain.Persistence.Identity;
 using DonationHub.Infrastructure.Options;
 using DonationHub.Infrastructure.Persistence.Identity;
@@ -9,7 +10,7 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
 {
     public static class DonorSeeder
     {
-        public static async Task SeedDonor(SeedDonorOptions options,
+        public static async Task<Result<ApplicationUser>> SeedDonor(SeedDonorOptions options,
              UserManager<ApplicationUser> userManager, DateTimeOffset dateTime)
 
 
@@ -20,9 +21,18 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
             var user = await userManager.FindByEmailAsync(options.Email);
             if (user is null)
             {
-                user = ApplicationUser.Create(fullName, donorEmail, PrefferedLanguage.EN, DateTime.UtcNow);
+                var userResult = ApplicationUser.Create(fullName, donorEmail, PrefferedLanguage.EN, DateTime.UtcNow);
+                if (userResult.IsFailure) return Result<ApplicationUser>.Failure(userResult.Error);
                 var result = await userManager.CreateAsync(user, donorPassword);
-                if (!result.Succeeded) throw new RegistrationFailedException(AuthErrors.InvalidCredentials, "Seeding Failed");
+                if (!result.Succeeded)
+                {
+                    var errors = new StringBuilder();
+                    foreach (var error in result.Errors)
+                    {
+                        errors.AppendLine(error.Description);
+                    }
+                    return Result<ApplicationUser>.Failure(new Error("", ""));
+                }
             }
             if (!await userManager.IsInRoleAsync(user, "Donor"))
             {
@@ -34,11 +44,10 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
                     {
                         errors.AppendLine(error.Description);
                     }
-
-                    throw new InvalidOperationException(
-                        $"Failed to assign Donor role: {errors}");
+                    return Result<ApplicationUser>.Failure(new Error("", ""));
                 }
             }
+            return Result<ApplicationUser>.Success(user);
         }
     }
 }

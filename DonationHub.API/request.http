@@ -1,0 +1,4 @@
+@baseUrl = https://localhost:7163
+
+### bad Request
+GET {{baseUrl}}/bad-request-no-body

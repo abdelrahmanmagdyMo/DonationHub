@@ -1,5 +1,5 @@
-﻿using DonationHub.Application.Contracts;
-using DonationHub.Domain.Donations;
+﻿using DonationHub.Domain.Donations;
+using DonationHub.Domain.Interfaces;
 using DonationHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,13 +15,13 @@ namespace DonationHub.Infrastructure.Concrete
 
         public async Task<IReadOnlyList<Donation>> GetAllAsync(CancellationToken ct = default)
         {
-            return await context.Donations.IgnoreQueryFilters().ToListAsync(ct);
+            return await context.Donations.IgnoreQueryFilters().AsNoTracking().ToListAsync(ct);
         }
 
 
         public async Task<Donation?> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
-            return await context.Donations.FirstOrDefaultAsync(x => x.Id == id, ct);
+            return await context.Donations.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public void Update(Donation entity)

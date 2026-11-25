@@ -1,4 +1,6 @@
-﻿using DonationHub.Domain.Persistence.Identity;
+﻿using DonationHub.Domain.Common.Results;
+using DonationHub.Domain.Common.Results.Abstractions;
+using DonationHub.Domain.Persistence.Identity;
 using DonationHub.Infrastructure.Options;
 using DonationHub.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +10,7 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
 {
     public static class ManagerSeeder
     {
-        public static async Task SeedManager(CampaignManagerSeedOptions options,
+        public static async Task<Result<ApplicationUser>> SeedManager(CampaignManagerSeedOptions options,
              UserManager<ApplicationUser> userManager, DateTimeOffset dateTime)
         {
             var ManagerEmail = options.Email;
@@ -17,7 +19,9 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
             var user = await userManager.FindByEmailAsync(options.Email);
             if (user is null)
             {
-                user = ApplicationUser.Create(fullName, ManagerEmail, PrefferedLanguage.EN, DateTimeOffset.UtcNow);
+                var userResult = ApplicationUser.Create(fullName, ManagerEmail, PrefferedLanguage.EN, DateTimeOffset.UtcNow);
+                if (userResult.IsFailure) return Result<ApplicationUser>.Failure(userResult.Error);
+
                 var result = await userManager.CreateAsync(user, ManagerPassword);
                 if (!result.Succeeded)
                 {
@@ -26,9 +30,8 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
                     {
                         errors.AppendLine(error.Description);
                     }
+                    return Result<ApplicationUser>.Failure(new Error("", ""));
 
-                    throw new InvalidOperationException(
-                        $"Failed to assign CampaignManager : {errors}");
                 }
                 if (!await userManager.IsInRoleAsync(user, "CampaignManager"))
                 {
@@ -41,11 +44,12 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
                             errors.AppendLine(error.Description);
                         }
 
-                        throw new InvalidOperationException(
-                            $"Failed to assign CampaignManager role: {errors}");
+                        return Result<ApplicationUser>.Failure(new Error("", ""));
                     }
                 }
+
             }
+            return Result<ApplicationUser>.Success(user);
         }
     }
 }

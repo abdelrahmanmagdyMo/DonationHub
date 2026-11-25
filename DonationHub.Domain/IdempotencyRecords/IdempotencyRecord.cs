@@ -1,4 +1,7 @@
-﻿namespace DonationHub.Domain.IdempotencyRecords
+﻿using DonationHub.Domain.Common.Results.Abstractions;
+using DonationHub.Domain.IdempotencyRecords.Errors;
+
+namespace DonationHub.Domain.IdempotencyRecords
 {
     public sealed class IdempotencyRecord
     {
@@ -23,17 +26,20 @@
             CreatedAt = createdAt;
             ExpiresAt = expiresAt;
         }
-        public static IdempotencyRecord Create(string key, Guid userId, string requestHash, int responseStatusCode, string responseBody, DateTimeOffset createdAt, DateTimeOffset expiresAt)
+        public static Result<IdempotencyRecord> Create(string key, Guid userId, string requestHash, int responseStatusCode, string responseBody, TimeProvider createdAt, DateTimeOffset expiresAt)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(key);
-            ArgumentException.ThrowIfNullOrWhiteSpace(requestHash);
-            ArgumentException.ThrowIfNullOrEmpty(responseBody);
-            if (expiresAt <= createdAt) throw new ArgumentException("Expire Date Must Be After Creation Date");
+            if (string.IsNullOrEmpty(key)) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.KeyIsRequired);
+            if (string.IsNullOrEmpty(requestHash)) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.requestHashIsRequired);
+            if (responseBody is null) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.responseBodyIsRequired);
+            if (expiresAt <= createdAt.GetUtcNow()) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.EndDateInPast);
             key = key.Trim();
-            if (key.Length > KeyMaxLength) throw new ArgumentException("Key Can not Exceed The Maximum Value");
-            if (responseStatusCode is < 100 or > 599) throw new ArgumentException(nameof(responseStatusCode));
-            if (userId == Guid.Empty) throw new ArgumentException("UserId Cannot Be Null Or Empty");
-            return new IdempotencyRecord(key, userId, requestHash, responseStatusCode, responseBody, createdAt, expiresAt);
+            var now = createdAt.GetUtcNow();
+
+            if (key.Length > KeyMaxLength) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.KeyMaxLength);
+            if (responseStatusCode is < 100 or > 599) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.responseStatusCodeRange);
+            if (userId == Guid.Empty) return Result<IdempotencyRecord>.Failure(IdempotencyErrors.UserIdIsRequired);
+            var idemPotency = new IdempotencyRecord(key, userId, requestHash, responseStatusCode, responseBody, now, expiresAt);
+            return Result<IdempotencyRecord>.Success(idemPotency);
         }
 
     }

@@ -1,4 +1,4 @@
-﻿using DonationHub.Domain.ProcessedStripeEvent;
+﻿using DonationHub.Domain.ProcessedStripeEvents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

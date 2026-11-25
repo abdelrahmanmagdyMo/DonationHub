@@ -7,14 +7,36 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DonationHub.Domain\DonationHub.Domain.csproj" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
+	  <PackageReference Include="MediatR" Version="[12.5.0]" />
+	
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.13" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.14" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
- 
+    <Folder Include="Features\Donations\Commands\" />
+    <Folder Include="Features\Donations\Mappers\" />
+    <Folder Include="Features\Donations\Queries\" />
+    <Folder Include="Features\Donations\Responses\" />
+    <Folder Include="Features\IdempotencyRecords\Commands\" />
+    <Folder Include="Features\IdempotencyRecords\Mappers\" />
+    <Folder Include="Features\IdempotencyRecords\Queries\" />
+    <Folder Include="Features\IdempotencyRecords\Responses\" />
+    <Folder Include="Features\Payments\Commands\" />
+    <Folder Include="Features\Payments\Mappers\" />
+    <Folder Include="Features\Payments\Queries\" />
+    <Folder Include="Features\Payments\Responses\" />
+    <Folder Include="Features\ProcessedStripeEvents\Commands\" />
+    <Folder Include="Features\ProcessedStripeEvents\Mappers\" />
+    <Folder Include="Features\ProcessedStripeEvents\Queries\" />
+    <Folder Include="Features\ProcessedStripeEvents\Responses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DonationHub.Domain\DonationHub.Domain.csproj" />
   </ItemGroup>
 
 </Project>

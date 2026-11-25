@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DonationHub.Infrastructure.Interceptor
 {
-    public class SoftDeleteInterceptor : SaveChangesInterceptor
+    public class SoftDeleteInterceptor(TimeProvider _time) : SaveChangesInterceptor
     {
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
+
             if (eventData.Context is null) return result;
             foreach (var entry in eventData.Context.ChangeTracker.Entries())
             {
@@ -16,7 +17,7 @@ namespace DonationHub.Infrastructure.Interceptor
                     continue;
 
                 entry.State = EntityState.Modified;
-                entity.Delete();
+                entity.Delete(_time);
             }
             return result;
         }
@@ -28,7 +29,7 @@ namespace DonationHub.Infrastructure.Interceptor
                 if (entry is not { State: EntityState.Deleted, Entity: ISoftDeletable entity })
                     continue;
                 entry.State = EntityState.Modified;
-                entity.Delete();
+                entity.Delete(_time);
             }
             return ValueTask.FromResult(result);
         }

@@ -1,5 +1,7 @@
 ﻿using DonationHub.Domain.Common;
+using DonationHub.Domain.Common.Results.Abstractions;
 using DonationHub.Domain.Payments.Enums;
+using DonationHub.Domain.Payments.Errors;
 using DonationHub.Domain.ValueObjects;
 
 namespace DonationHub.Domain.Payments
@@ -20,11 +22,14 @@ namespace DonationHub.Domain.Payments
             Amount = amount;
             Status = PaymentAttemptStatus.Created;
         }
-        public static PaymentAttempt Create(Guid donationId, string stripeCheckoutSessionId, Money amount)
+        public static Result<PaymentAttempt> Create(Guid donationId, string stripeCheckoutSessionId, Money amount)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(stripeCheckoutSessionId);
-            if (donationId == Guid.Empty) throw new ArgumentException("Donation Id cannot be empty.");
-            return new PaymentAttempt(donationId, stripeCheckoutSessionId.Trim(), amount);
+            if (stripeCheckoutSessionId is null)
+                return Result<PaymentAttempt>
+                    .Failure(PaymentErrors.stripeCheckoutSessionIdIsRequired);
+            if (donationId == Guid.Empty) return Result<PaymentAttempt>.Failure(PaymentErrors.DonationIdIsRequired);
+            var payment = new PaymentAttempt(donationId, stripeCheckoutSessionId.Trim(), amount);
+            return Result<PaymentAttempt>.Success(payment);
         }
     }
 }

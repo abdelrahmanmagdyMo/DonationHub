@@ -1,5 +1,5 @@
-﻿using DonationHub.Application.Contracts;
-using DonationHub.Domain.ProcessedStripeEvent;
+﻿using DonationHub.Domain.Interfaces;
+using DonationHub.Domain.ProcessedStripeEvents;
 using DonationHub.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +16,12 @@ namespace DonationHub.Infrastructure.Concrete
 
         public async Task<IReadOnlyList<ProcessedStripeEvent>> GetAllAsync(CancellationToken ct = default)
         {
-            return await context.ProcessedStripeEvents.ToListAsync(ct);
+            return await context.ProcessedStripeEvents.AsNoTracking().ToListAsync(ct);
         }
 
         public async Task<ProcessedStripeEvent?> GetByIdAsync(string id, CancellationToken ct = default)
         {
-            return await context.ProcessedStripeEvents.FirstOrDefaultAsync(x => x.EventId == id, ct);
+            return await context.ProcessedStripeEvents.AsNoTracking().FirstOrDefaultAsync(x => x.EventId == id, ct);
         }
 
         public void Update(ProcessedStripeEvent entity)

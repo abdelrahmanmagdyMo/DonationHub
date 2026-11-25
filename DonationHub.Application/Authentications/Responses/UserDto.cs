@@ -1,4 +1,4 @@
 ﻿namespace DonationHub.Application.Authentications.Responses
 {
-    public record UserDto(string Id, string Email, string FullName, IEnumerable<string> roles);
+    public record UserDto(Guid Id, string Email, string FullName, bool IsActive, IEnumerable<string> roles);
 }

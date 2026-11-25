@@ -1,7 +1,8 @@
-﻿
+﻿using DonationHub.Domain.Common.Results.Abstractions;
+using DonationHub.Domain.Identity.RefreshToken;
 using DonationHub.Domain.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
-
+using AuthErrors = DonationHub.Domain.Identity.Errors;
 namespace DonationHub.Infrastructure.Persistence.Identity
 {
     public sealed class ApplicationUser : IdentityUser<Guid>
@@ -29,20 +30,22 @@ namespace DonationHub.Infrastructure.Persistence.Identity
             CreatedAt = createdAt;
         }
 
-        public static ApplicationUser Create(
+        public static Result<ApplicationUser> Create(
             string fullName,
             string email,
             PrefferedLanguage preferredLanguage,
             DateTimeOffset createdAt)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(fullName);
-            ArgumentException.ThrowIfNullOrWhiteSpace(email);
+            if (string.IsNullOrEmpty(fullName)) return Result<ApplicationUser>.Failure(AuthErrors.AuthErrors.Validation);
+            if (string.IsNullOrEmpty(email)) return Result<ApplicationUser>.Failure(AuthErrors.AuthErrors.Validation);
 
-            return new ApplicationUser(
+            var appUser =
+             new ApplicationUser(
                 fullName.Trim(),
                 email.Trim(),
                 preferredLanguage,
                 createdAt);
+            return Result<ApplicationUser>.Success(appUser);
         }
     }
 

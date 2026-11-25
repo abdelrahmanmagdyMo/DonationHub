@@ -1,6 +1,15 @@
-﻿using DonationHub.Application.Contracts;
-using DonationHub.Application.Features.Auth;
+﻿using DonationHub.Application.Behaviors;
+using DonationHub.Application.Contracts;
+using DonationHub.Application.Features.Categories.Queries.GetCategories;
+using DonationHub.Domain.Campaigns;
+using DonationHub.Domain.Categories;
+using DonationHub.Domain.Donations;
+using DonationHub.Domain.IdempotencyRecords;
+using DonationHub.Domain.Interfaces;
+using DonationHub.Domain.Payments;
+using DonationHub.Domain.ProcessedStripeEvents;
 using DonationHub.Infrastructure.Concrete;
+using DonationHub.Infrastructure.Concrete.Shared;
 using DonationHub.Infrastructure.Interceptor;
 using DonationHub.Infrastructure.Options;
 using DonationHub.Infrastructure.Persistence;
@@ -22,19 +31,40 @@ namespace DonationHub.Infrastructure.Extensions
         public static IServiceCollection InfrastructureRegisterServices(this IServiceCollection services,
             IConfiguration configuration, IHostEnvironment environment)
         {
+
+            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            services.AddOpenApi();
+
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQuery).Assembly);
+                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            }
+            );
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+
             services.AddScoped<ICampaignRepository, CampaignRepository>();
             services.AddScoped<IDonationRepository, DonationRepository>();
             services.AddScoped<IIdempotencyRecordRepository, IdempotencyRecordRepository>();
             services.AddScoped<IPaymentAttemptRepository, PaymentAttemptRepository>();
             services.AddScoped<IProcessedStripeEventRepository, ProcessedStripeEventRepository>();
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            services.AddScoped(typeof(IDeletableRepository<,>), typeof(DeletableRepository<,>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddDbContext<AppDbContext>(o =>
+
+            services.AddSingleton<SoftDeleteInterceptor>();
+            services.AddDbContext<AppDbContext>((sp, o) =>
             {
-                o.UseSqlServer(configuration.GetConnectionString("constr"))
-                .AddInterceptors(new SoftDeleteInterceptor());
+                var connectionString = configuration.GetConnectionString("constr")
+                                   ?? throw new InvalidOperationException(
+                                       "Connection string 'constr' not found.");
+                o.UseSqlServer(connectionString)
+                .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>());
             }).AddIdentity<ApplicationUser, IdentityRole<Guid>>(op =>
             {
                 //password config
@@ -52,7 +82,7 @@ namespace DonationHub.Infrastructure.Extensions
 
             }).AddEntityFrameworkStores<AppDbContext>();
 
-            services.AddScoped(typeof(IDeletableRepository<,>), typeof(GenericRepository<,>));
+
 
 
             services.AddAuthentication(o =>

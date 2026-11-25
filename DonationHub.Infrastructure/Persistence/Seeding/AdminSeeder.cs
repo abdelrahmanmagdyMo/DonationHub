@@ -1,4 +1,5 @@
 ﻿
+using DonationHub.Domain.Common.Results.Abstractions;
 using DonationHub.Domain.Persistence.Identity;
 using DonationHub.Infrastructure.Options;
 using DonationHub.Infrastructure.Persistence.Identity;
@@ -9,7 +10,7 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
 {
     public static class AdminSeeder
     {
-        public static async Task SeedAdmin(
+        public static async Task<Result<ApplicationUser>> SeedAdmin(
             SeedAdminOptions seedAdmin,
             UserManager<ApplicationUser> userManager,
             TimeProvider timeProvider)
@@ -24,11 +25,12 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
 
             if (admin is null)
             {
-                admin = ApplicationUser.Create(
-                    fullName,
-                    adminEmail,
-                    PrefferedLanguage.EN,
-                    timeProvider.GetUtcNow());
+                var adminResult = ApplicationUser.Create(
+                       fullName,
+                       adminEmail,
+                       PrefferedLanguage.EN,
+                       timeProvider.GetUtcNow());
+                if (adminResult.IsFailure) return Result<ApplicationUser>.Failure(adminResult.Error);
 
                 var result = await userManager.CreateAsync(
                     admin,
@@ -66,6 +68,8 @@ namespace DonationHub.Infrastructure.Persistence.Seeding
                         $"Failed to assign Admin role: {errors}");
                 }
             }
+            return Result<ApplicationUser>.Success(admin);
         }
+
     }
 }

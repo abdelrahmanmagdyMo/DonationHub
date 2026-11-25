@@ -1,7 +1,8 @@
 ﻿using DonationHub.Domain.Campaigns;
 using DonationHub.Domain.Common;
+using DonationHub.Domain.Common.Results.Abstractions;
 using DonationHub.Domain.Donations.Enums;
-using DonationHub.Domain.Exceptions;
+using DonationHub.Domain.Donations.Errors;
 using DonationHub.Domain.ValueObjects;
 
 namespace DonationHub.Domain.Donations
@@ -23,23 +24,26 @@ namespace DonationHub.Domain.Donations
 Guid campaignId,
 Guid donorUserId,
 Money amount,
-DateTimeOffset now) : base(Guid.Empty)
+TimeProvider timeProvider) : base(Guid.Empty)
         {
             CampaignId = campaignId;
             DonorUserId = donorUserId;
             Amount = amount;
             Status = DonationStatus.Pending;
-            CreatedAt = now;
+            CreatedAt = timeProvider.GetUtcNow();
         }
-        public static Donation Create(Guid campaignId, Guid donorUserId, Money amount, DateTimeOffset now)
+        public static Result<Donation> Create(Guid campaignId, Guid donorUserId, Money amount, TimeProvider timeProvider)
         {
-            if (campaignId == Guid.Empty) throw new ArgumentException("campaignId Cannot Be Empty");
-            if (donorUserId == Guid.Empty) throw new ArgumentException("donorUserId Cannot Be Empty");
-            if (amount is null || amount.Amount <= 0) throw new Money_Amount_Exception();
-            if (amount.Currency is null || string.IsNullOrWhiteSpace(amount.Currency))
-                throw new Money_CurrencyException();
+            if (campaignId == Guid.Empty) return Result<Donation>.Failure(DonationErrors.campaignIdIsReuired);
+            if (donorUserId == Guid.Empty) return Result<Donation>.Failure(DonationErrors.DonorUserId);
+            if (amount is null || amount.Amount <= 0) return Result<Donation>.Failure(DonationErrors.AmountIsRequired);
 
-            return new Donation(campaignId, donorUserId, amount, now);
+            if (amount.Currency is null || string.IsNullOrWhiteSpace(amount.Currency))
+                return Result<Donation>.Failure(DonationErrors.CurrencyIsRequired);
+
+
+            var donation = new Donation(campaignId, donorUserId, amount, timeProvider);
+            return Result<Donation>.Success(donation);
         }
 
     }

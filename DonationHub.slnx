@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/SRC/">
     <Project Path="DonationHub.API/DonationHub.API.csproj" />
+    <Project Path="DonationHub.Application.UnitTests/DonationHub.Application.UnitTests.csproj" Id="3aa03632-ea12-4fc8-94a5-694fc1f85256" />
     <Project Path="DonationHub.Application/DonationHub.Application.csproj" />
+    <Project Path="DonationHub.Domain.Tests/DonationHub.Domain.Tests.csproj" Id="bb7a24d6-fef5-42c5-b6ef-c248804307ec" />
     <Project Path="DonationHub.Domain/DonationHub.Domain.csproj" />
     <Project Path="DonationHub.Infrastructure/DonationHub.Infrastructure.csproj" />
   </Folder>

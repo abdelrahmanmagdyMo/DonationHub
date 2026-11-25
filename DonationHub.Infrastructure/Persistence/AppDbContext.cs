@@ -2,8 +2,9 @@
 using DonationHub.Domain.Categories;
 using DonationHub.Domain.Donations;
 using DonationHub.Domain.IdempotencyRecords;
+using DonationHub.Domain.Identity.RefreshToken;
 using DonationHub.Domain.Payments;
-using DonationHub.Domain.ProcessedStripeEvent;
+using DonationHub.Domain.ProcessedStripeEvents;
 using DonationHub.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

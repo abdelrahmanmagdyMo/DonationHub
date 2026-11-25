@@ -40,7 +40,7 @@ namespace DonationHub.Infrastructure.Configurations
             builder.Property(x => x.UpdatedAt).IsRequired();
             builder.Property(x => x.EndDate).IsRequired();
             builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
-            builder.Property(x => x.RowVersion).IsConcurrencyToken();
+            builder.Property(x => x.RowVersion).IsRowVersion();
 
             builder.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.CreatedByUserId).OnDelete(DeleteBehavior.Restrict);
             builder.HasQueryFilter(x => !x.IsDeleted);
