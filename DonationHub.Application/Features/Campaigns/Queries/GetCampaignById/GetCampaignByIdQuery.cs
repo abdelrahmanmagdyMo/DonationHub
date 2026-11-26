@@ -4,6 +4,6 @@ using MediatR;
 
 namespace DonationHub.Application.Features.Campaigns.Queries.GetCampaignById
 {
-    public sealed record GetCampaignByIdQuery(Guid Id, string Lang) : IRequest<Result<CampaignListDto>>;
+    public sealed record GetCampaignByIdQuery(Guid Id) : IRequest<Result<CampaignListDto>>;
 
 }
